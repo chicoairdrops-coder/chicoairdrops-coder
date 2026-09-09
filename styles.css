@@ -91,6 +91,11 @@ th { background: #122237; color: #a8bbcd; font-size: .77rem; letter-spacing: .08
 .sort-arrow { color: var(--accent); font-size: 1rem; line-height: 1; }
 td { font-size: .94rem; color: #dce7ef; }
 td:first-child { color: #fff; font-weight: 750; }
+.item-name { display: flex; align-items: center; gap: 11px; min-width: 180px; }
+.item-gif {
+  flex: 0 0 auto; width: 42px; height: 42px; object-fit: contain;
+  border: 1px solid #2a4055; border-radius: 9px; background: #07101b;
+}
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr:hover td { background: rgba(101, 230, 196, .035); }
 .sale-status { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 9px; font-size: .8rem; font-weight: 800; }

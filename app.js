@@ -46,9 +46,39 @@
     return value;
   }
 
-  function findNameAfterOpenOne(block) {
-    const match = block.match(/miner\s+detai(?:ls|s)\s+open(?:\s+[1-5])?\s*(?::|=|-|–|—|\|)?\s*(?:\r?\n\s*)?([^\r\n]+)/i);
-    return match ? normalize(match[1]) : "";
+  function extractGifSource(value) {
+    const htmlSource = value.match(/<img[^>]+src=["']([^"']+\.gif(?:\?[^"']*)?)["']/i);
+    if (htmlSource) return htmlSource[1];
+    const markdownSource = value.match(/!\[[^\]]*\]\(([^)]+\.gif(?:\?[^)]*)?)\)/i);
+    if (markdownSource) return markdownSource[1];
+    const dataSource = value.match(/data:image\/gif;base64,[a-z0-9+/=]+/i);
+    if (dataSource) return dataSource[0];
+    const urlSource = value.match(/https?:\/\/[^\s<>"')]+\.gif(?:\?[^\s<>"')]+)?/i);
+    if (urlSource) return urlSource[0];
+    const fileSource = value.match(/(?:^|\s)([^\s<>"')]+\.gif(?:\?[^\s<>"')]+)?)(?=\s|$)/i);
+    return fileSource ? fileSource[1] : "";
+  }
+
+  function findNameAndGif(block) {
+    const match = block.match(/miner\s+detai(?:ls|s)\s+open(?:\s+[1-5])?\s*(?::|=|-|–|—|\|)?\s*([\s\S]*)/i);
+    if (!match) return { name: "", gif: "" };
+
+    const lines = match[1].split(/\r?\n/).map(normalize).filter(Boolean);
+    let gif = "";
+    let name = "";
+    for (const line of lines) {
+      const foundGif = extractGifSource(line);
+      if (foundGif && !gif) gif = foundGif;
+      const withoutGif = normalize(line
+        .replace(/<img[^>]*>/ig, "")
+        .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+        .replace(foundGif || /$^/, ""));
+      if (withoutGif) {
+        name = withoutGif;
+        break;
+      }
+    }
+    return { name, gif };
   }
 
   function findSellable(block) {
@@ -68,7 +98,8 @@
       const fields = {};
       for (const [key, aliases] of Object.entries(FIELD_PATTERNS)) fields[key] = findField(block, aliases);
 
-      fields.name = findNameAfterOpenOne("Miner details" + block) || fields.name;
+      const identity = findNameAndGif("Miner details" + block);
+      fields.name = identity.name || fields.name;
 
       if (!fields.name) {
         const knownLabels = Object.values(FIELD_PATTERNS).flat();
@@ -80,6 +111,7 @@
 
       return {
         name: fields.name,
+        gif: identity.gif || extractGifSource(block),
         size: fields.size || "—",
         power: fields.power || "—",
         bonus: fields.bonus || "—",
@@ -95,13 +127,33 @@
     return cell;
   }
 
+  function createNameCell(item) {
+    const cell = document.createElement("td");
+    const wrapper = document.createElement("div");
+    wrapper.className = "item-name";
+    if (item.gif) {
+      const image = document.createElement("img");
+      image.className = "item-gif";
+      image.src = item.gif;
+      image.alt = `Imagem de ${item.name}`;
+      image.loading = "lazy";
+      image.addEventListener("error", () => image.remove());
+      wrapper.append(image);
+    }
+    const name = document.createElement("span");
+    name.textContent = item.name;
+    wrapper.append(name);
+    cell.append(wrapper);
+    return cell;
+  }
+
   function render(items, shouldScroll = true) {
     const body = document.querySelector("#items-body");
     body.replaceChildren();
 
     items.forEach(item => {
       const row = document.createElement("tr");
-      row.append(createCell(item.name), createCell(item.size), createCell(item.power), createCell(item.bonus), createCell(item.quantity));
+      row.append(createNameCell(item), createCell(item.size), createCell(item.power), createCell(item.bonus), createCell(item.quantity));
       const saleCell = document.createElement("td");
       const status = document.createElement("span");
       status.className = "sale-status " + (item.sellable === "Sim" ? "sale-yes" : item.sellable === "Não" ? "sale-no" : "sale-unknown");
