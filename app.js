@@ -2,7 +2,8 @@
   "use strict";
 
   let currentItems = [];
-  let nameSortDirection = null;
+  let activeSortField = null;
+  let activeSortDirection = null;
 
   const FIELD_PATTERNS = {
     name: ["name", "nome", "miner name", "item name"],
@@ -115,26 +116,27 @@
     if (shouldScroll) document.querySelector("#results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function sortItemsByName(items, direction) {
+  function sortItems(items, field, direction) {
     const multiplier = direction === "asc" ? 1 : -1;
     return [...items].sort((a, b) =>
-      a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base", numeric: true }) * multiplier
+      String(a[field]).localeCompare(String(b[field]), "pt-BR", { sensitivity: "base", numeric: true }) * multiplier
     );
   }
 
-  function sortByName() {
+  function sortByField(button) {
     if (!currentItems.length) return;
-    nameSortDirection = nameSortDirection === "asc" ? "desc" : "asc";
-    const sorted = sortItemsByName(currentItems, nameSortDirection);
+    const field = button.dataset.sortField;
+    activeSortDirection = activeSortField === field && activeSortDirection === "asc" ? "desc" : "asc";
+    activeSortField = field;
+    const sorted = sortItems(currentItems, field, activeSortDirection);
 
-    const header = document.querySelector("#sort-name").closest("th");
-    const arrow = document.querySelector("#sort-arrow");
-    header.setAttribute("aria-sort", nameSortDirection === "asc" ? "ascending" : "descending");
-    arrow.textContent = nameSortDirection === "asc" ? "↑" : "↓";
-    document.querySelector("#sort-name").setAttribute(
-      "aria-label",
-      nameSortDirection === "asc" ? "Ordenar por nome em ordem decrescente" : "Ordenar por nome em ordem crescente"
-    );
+    document.querySelectorAll(".sort-button").forEach(sortButton => {
+      const isActive = sortButton === button;
+      sortButton.closest("th").setAttribute("aria-sort", isActive ? (activeSortDirection === "asc" ? "ascending" : "descending") : "none");
+      sortButton.querySelector(".sort-arrow").textContent = isActive ? (activeSortDirection === "asc" ? "↑" : "↓") : "↕";
+      const nextOrder = isActive && activeSortDirection === "asc" ? "decrescente" : "crescente";
+      sortButton.setAttribute("aria-label", `Ordenar por ${sortButton.dataset.sortLabel} em ordem ${nextOrder}`);
+    });
     render(sorted, false);
   }
 
@@ -154,20 +156,25 @@
     }
     message.textContent = "";
     currentItems = items;
-    nameSortDirection = null;
-    document.querySelector("#sort-arrow").textContent = "↕";
-    document.querySelector("#sort-name").closest("th").setAttribute("aria-sort", "none");
-    document.querySelector("#sort-name").setAttribute("aria-label", "Ordenar por nome em ordem crescente");
+    activeSortField = null;
+    activeSortDirection = null;
+    document.querySelectorAll(".sort-button").forEach(button => {
+      button.querySelector(".sort-arrow").textContent = "↕";
+      button.closest("th").setAttribute("aria-sort", "none");
+      button.setAttribute("aria-label", `Ordenar por ${button.dataset.sortLabel} em ordem crescente`);
+    });
     render(items);
   }
 
   if (typeof document !== "undefined") {
     document.querySelector("#calculate").addEventListener("click", calculate);
-    document.querySelector("#sort-name").addEventListener("click", sortByName);
+    document.querySelectorAll(".sort-button").forEach(button => {
+      button.addEventListener("click", () => sortByField(button));
+    });
     document.querySelector("#raw-data").addEventListener("keydown", event => {
       if ((event.ctrlKey || event.metaKey) && event.key === "Enter") calculate();
     });
   }
 
-  if (typeof module !== "undefined") module.exports = { parseMinerDetails, sortItemsByName };
+  if (typeof module !== "undefined") module.exports = { parseMinerDetails, sortItems };
 })();

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Organize dados de Miner details em uma tabela clara.">
   <title>Miner Details — Organizador</title>
-  <link rel="stylesheet" href="./styles.css?v=5">
+  <link rel="stylesheet" href="./styles.css?v=6">
 </head>
 <body>
   <main class="shell">
@@ -51,17 +51,12 @@
         <table>
           <thead>
             <tr>
-              <th scope="col" aria-sort="none">
-                <button id="sort-name" class="sort-button" type="button" aria-label="Ordenar por nome em ordem crescente">
-                  <span>Nome</span>
-                  <span id="sort-arrow" class="sort-arrow" aria-hidden="true">↕</span>
-                </button>
-              </th>
-              <th scope="col">Size</th>
-              <th scope="col">Power</th>
-              <th scope="col">Bonus</th>
-              <th scope="col">Quantidade</th>
-              <th scope="col">Pode ser vendido</th>
+              <th scope="col" aria-sort="none"><button class="sort-button" type="button" data-sort-field="name" data-sort-label="Nome" aria-label="Ordenar por Nome em ordem crescente"><span>Nome</span><span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button class="sort-button" type="button" data-sort-field="size" data-sort-label="Size" aria-label="Ordenar por Size em ordem crescente"><span>Size</span><span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button class="sort-button" type="button" data-sort-field="power" data-sort-label="Power" aria-label="Ordenar por Power em ordem crescente"><span>Power</span><span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button class="sort-button" type="button" data-sort-field="bonus" data-sort-label="Bonus" aria-label="Ordenar por Bonus em ordem crescente"><span>Bonus</span><span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button class="sort-button" type="button" data-sort-field="quantity" data-sort-label="Quantidade" aria-label="Ordenar por Quantidade em ordem crescente"><span>Quantidade</span><span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" aria-sort="none"><button class="sort-button" type="button" data-sort-field="sellable" data-sort-label="Pode ser vendido" aria-label="Ordenar por Pode ser vendido em ordem crescente"><span>Pode ser vendido</span><span class="sort-arrow" aria-hidden="true">↕</span></button></th>
             </tr>
           </thead>
           <tbody id="items-body"></tbody>
@@ -69,6 +64,6 @@
       </div>
     </section>
   </main>
-  <script src="./app.js?v=5"></script>
+  <script src="./app.js?v=6"></script>
 </body>
 </html>
