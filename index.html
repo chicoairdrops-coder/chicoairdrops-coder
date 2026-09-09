@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Organize dados de Miner details em uma tabela clara.">
+  <title>Miner Details — Organizador</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">M</div>
+      <div>
+        <p class="eyebrow">ORGANIZADOR DE DADOS</p>
+        <h1>Miner Details</h1>
+      </div>
+    </header>
+
+    <section class="workspace" aria-labelledby="input-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="input-title">Cole os dados dos itens</h2>
+          <p>Cada ocorrência de <strong>Miner details</strong> inicia um novo item.</p>
+        </div>
+        <span class="privacy-badge">Processado no navegador</span>
+      </div>
+
+      <label class="sr-only" for="raw-data">Dados dos itens</label>
+      <textarea id="raw-data" spellcheck="false" placeholder="Miner details&#10;Name: Crystal Miner&#10;Size: 2x2&#10;Power: 150 TH/s&#10;Bonus: +12%&#10;Quantity: 3&#10;Can be sold: Yes&#10;&#10;Miner details&#10;Name: Solar Miner&#10;..."></textarea>
+
+      <div class="action-row">
+        <p id="helper">Cole um ou mais blocos para começar.</p>
+        <button id="calculate" type="button">
+          <span>Calcular</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="results" class="results" aria-labelledby="results-title" hidden>
+      <div class="results-heading">
+        <div>
+          <p class="eyebrow">RESULTADO</p>
+          <h2 id="results-title">Itens encontrados</h2>
+        </div>
+        <span id="count" class="count"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+              <th scope="col">Size</th>
+              <th scope="col">Power</th>
+              <th scope="col">Bonus</th>
+              <th scope="col">Quantidade</th>
+              <th scope="col">Pode ser vendido</th>
+            </tr>
+          </thead>
+          <tbody id="items-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
