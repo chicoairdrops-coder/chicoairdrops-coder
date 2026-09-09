@@ -94,7 +94,7 @@
     return cell;
   }
 
-  function render(items) {
+  function render(items, shouldScroll = true) {
     const body = document.querySelector("#items-body");
     body.replaceChildren();
 
@@ -112,16 +112,20 @@
 
     document.querySelector("#count").textContent = `${items.length} ${items.length === 1 ? "item" : "itens"}`;
     document.querySelector("#results").hidden = false;
-    document.querySelector("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (shouldScroll) document.querySelector("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function sortItemsByName(items, direction) {
+    const multiplier = direction === "asc" ? 1 : -1;
+    return [...items].sort((a, b) =>
+      a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base", numeric: true }) * multiplier
+    );
   }
 
   function sortByName() {
     if (!currentItems.length) return;
     nameSortDirection = nameSortDirection === "asc" ? "desc" : "asc";
-    const direction = nameSortDirection === "asc" ? 1 : -1;
-    const sorted = [...currentItems].sort((a, b) =>
-      a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base", numeric: true }) * direction
-    );
+    const sorted = sortItemsByName(currentItems, nameSortDirection);
 
     const header = document.querySelector("#sort-name").closest("th");
     const arrow = document.querySelector("#sort-arrow");
@@ -131,7 +135,7 @@
       "aria-label",
       nameSortDirection === "asc" ? "Ordenar por nome em ordem decrescente" : "Ordenar por nome em ordem crescente"
     );
-    render(sorted);
+    render(sorted, false);
   }
 
   function calculate() {
@@ -165,5 +169,5 @@
     });
   }
 
-  if (typeof module !== "undefined") module.exports = { parseMinerDetails };
+  if (typeof module !== "undefined") module.exports = { parseMinerDetails, sortItemsByName };
 })();
