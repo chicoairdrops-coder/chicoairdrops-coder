@@ -7,7 +7,7 @@
     power: ["power", "poder", "potência", "potencia"],
     bonus: ["bonus", "bônus", "bonificação", "bonificacao"],
     quantity: ["quantity", "quantidade", "qty", "qtd"],
-    sellable: ["can be sold", "can sell", "sellable", "tradable", "tradeable", "pode ser vendido", "vendável", "vendavel"]
+    sellable: ["can be sold", "can't be sold", "can´t be sold"]
   };
 
   function normalize(value) {
@@ -42,8 +42,20 @@
     return value;
   }
 
+  function findNameAfterOpenOne(block) {
+    const match = block.match(/miner\s+detai(?:ls|s)\s+open\s+1\s*(?::|=|-|–|—|\|)?\s*(?:\r?\n\s*)?([^\r\n]+)/i);
+    return match ? normalize(match[1]) : "";
+  }
+
+  function findSellable(block) {
+    // A forma negativa precisa ser verificada antes da positiva.
+    if (/\b(?:can\s*['’´`]\s*t|cannot)\s+be\s+sold\b/i.test(block)) return "Não";
+    if (/\bcan\s+be\s+sold\b/i.test(block)) return "Sim";
+    return "Não informado";
+  }
+
   function parseMinerDetails(raw) {
-    const marker = /miner\s+details/ig;
+    const marker = /miner\s+detai(?:ls|s)/ig;
     if (!marker.test(raw)) return [];
     marker.lastIndex = 0;
     const blocks = raw.split(marker).slice(1).filter(block => block.trim());
@@ -51,6 +63,8 @@
     return blocks.map((block, index) => {
       const fields = {};
       for (const [key, aliases] of Object.entries(FIELD_PATTERNS)) fields[key] = findField(block, aliases);
+
+      fields.name = findNameAfterOpenOne("Miner details" + block) || fields.name;
 
       if (!fields.name) {
         const knownLabels = Object.values(FIELD_PATTERNS).flat();
@@ -66,7 +80,7 @@
         power: fields.power || "—",
         bonus: fields.bonus || "—",
         quantity: fields.quantity || "—",
-        sellable: normalizeSellable(fields.sellable)
+        sellable: findSellable(block)
       };
     });
   }
