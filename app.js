@@ -43,7 +43,7 @@
   }
 
   function findNameAfterOpenOne(block) {
-    const match = block.match(/miner\s+detai(?:ls|s)\s+open\s+1\s*(?::|=|-|–|—|\|)?\s*(?:\r?\n\s*)?([^\r\n]+)/i);
+    const match = block.match(/miner\s+detai(?:ls|s)\s+open(?:\s+1)?\s*(?::|=|-|–|—|\|)?\s*(?:\r?\n\s*)?([^\r\n]+)/i);
     return match ? normalize(match[1]) : "";
   }
 
