@@ -1,6 +1,9 @@
 (function () {
   "use strict";
 
+  let currentItems = [];
+  let nameSortDirection = null;
+
   const FIELD_PATTERNS = {
     name: ["name", "nome", "miner name", "item name"],
     size: ["size", "tamanho"],
@@ -112,6 +115,25 @@
     document.querySelector("#results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function sortByName() {
+    if (!currentItems.length) return;
+    nameSortDirection = nameSortDirection === "asc" ? "desc" : "asc";
+    const direction = nameSortDirection === "asc" ? 1 : -1;
+    const sorted = [...currentItems].sort((a, b) =>
+      a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base", numeric: true }) * direction
+    );
+
+    const header = document.querySelector("#sort-name").closest("th");
+    const arrow = document.querySelector("#sort-arrow");
+    header.setAttribute("aria-sort", nameSortDirection === "asc" ? "ascending" : "descending");
+    arrow.textContent = nameSortDirection === "asc" ? "↑" : "↓";
+    document.querySelector("#sort-name").setAttribute(
+      "aria-label",
+      nameSortDirection === "asc" ? "Ordenar por nome em ordem decrescente" : "Ordenar por nome em ordem crescente"
+    );
+    render(sorted);
+  }
+
   function calculate() {
     const raw = document.querySelector("#raw-data").value;
     const message = document.querySelector("#message");
@@ -127,11 +149,17 @@
       return;
     }
     message.textContent = "";
+    currentItems = items;
+    nameSortDirection = null;
+    document.querySelector("#sort-arrow").textContent = "↕";
+    document.querySelector("#sort-name").closest("th").setAttribute("aria-sort", "none");
+    document.querySelector("#sort-name").setAttribute("aria-label", "Ordenar por nome em ordem crescente");
     render(items);
   }
 
   if (typeof document !== "undefined") {
     document.querySelector("#calculate").addEventListener("click", calculate);
+    document.querySelector("#sort-name").addEventListener("click", sortByName);
     document.querySelector("#raw-data").addEventListener("keydown", event => {
       if ((event.ctrlKey || event.metaKey) && event.key === "Enter") calculate();
     });

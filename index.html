@@ -51,7 +51,12 @@
         <table>
           <thead>
             <tr>
-              <th scope="col">Nome</th>
+              <th scope="col" aria-sort="none">
+                <button id="sort-name" class="sort-button" type="button" aria-label="Ordenar por nome em ordem crescente">
+                  <span>Nome</span>
+                  <span id="sort-arrow" class="sort-arrow" aria-hidden="true">↕</span>
+                </button>
+              </th>
               <th scope="col">Size</th>
               <th scope="col">Power</th>
               <th scope="col">Bonus</th>

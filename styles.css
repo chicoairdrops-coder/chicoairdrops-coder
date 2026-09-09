@@ -80,6 +80,15 @@ button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 table { width: 100%; border-collapse: collapse; min-width: 820px; background: #0a1521; }
 th, td { padding: 15px 16px; text-align: left; border-bottom: 1px solid #1d3043; }
 th { background: #122237; color: #a8bbcd; font-size: .77rem; letter-spacing: .08em; text-transform: uppercase; }
+.sort-button {
+  min-width: 0; padding: 0; gap: 8px; border-radius: 5px;
+  background: transparent; color: inherit; box-shadow: none;
+  font-size: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+.sort-button:hover { color: var(--accent); background: transparent; filter: none; transform: none; }
+.sort-button:active { transform: none; }
+.sort-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+.sort-arrow { color: var(--accent); font-size: 1rem; line-height: 1; }
 td { font-size: .94rem; color: #dce7ef; }
 td:first-child { color: #fff; font-weight: 750; }
 tbody tr:last-child td { border-bottom: 0; }
