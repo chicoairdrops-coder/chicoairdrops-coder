@@ -147,6 +147,14 @@
     return cell;
   }
 
+  function quantityAsNumber(value) {
+    if (!value || value === "—") return 0;
+    const digits = String(value).match(/-?[\d.,]+/);
+    if (!digits) return 0;
+    const integer = Number(digits[0].replace(/[^\d-]/g, ""));
+    return Number.isFinite(integer) ? integer : 0;
+  }
+
   function render(items, shouldScroll = true) {
     const body = document.querySelector("#items-body");
     body.replaceChildren();
@@ -164,6 +172,8 @@
     });
 
     document.querySelector("#count").textContent = `${items.length} ${items.length === 1 ? "item" : "itens"}`;
+    const totalQuantity = items.reduce((total, item) => total + quantityAsNumber(item.quantity), 0);
+    document.querySelector("#total-quantity").textContent = `${totalQuantity.toLocaleString("pt-BR")} ${totalQuantity === 1 ? "unidade" : "unidades"} no total`;
     document.querySelector("#results").hidden = false;
     if (shouldScroll) document.querySelector("#results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -228,5 +238,5 @@
     });
   }
 
-  if (typeof module !== "undefined") module.exports = { parseMinerDetails, sortItems };
+  if (typeof module !== "undefined") module.exports = { parseMinerDetails, sortItems, quantityAsNumber };
 })();

@@ -52,6 +52,7 @@ h2 { font-size: clamp(1.2rem, 2.5vw, 1.55rem); letter-spacing: -.025em; }
   flex: 0 0 auto; border: 1px solid #27574e; background: #0d2a26;
   color: #a6e8d7; border-radius: 999px; padding: 7px 11px; font-size: .78rem; font-weight: 700;
 }
+.summary-badges { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 
 textarea {
   display: block; width: 100%; min-height: 320px; resize: vertical; margin-top: 24px;
