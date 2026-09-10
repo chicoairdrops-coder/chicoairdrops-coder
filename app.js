@@ -61,6 +61,21 @@
     return fileSource ? fileSource[1] : "";
   }
 
+  function looksLikeAddress(value) {
+    const text = value.trim();
+    return /^(?:https?:\/\/|www\.|data:image\/|blob:|file:\/\/)/i.test(text)
+      || /^\S+\.(?:gif|png|jpe?g|webp|svg)(?:\?\S*)?$/i.test(text);
+  }
+
+  function removeAddresses(value) {
+    return normalize(value
+      .replace(/\[\[MINER_IMAGE\]\]\S+/ig, "")
+      .replace(/data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=]+/ig, "")
+      .replace(/(?:https?:\/\/|blob:|file:\/\/)\S+/ig, "")
+      .replace(/\bwww\.\S+/ig, "")
+      .replace(/\S+\.(?:gif|png|jpe?g|webp|svg)(?:\?\S*)?/ig, ""));
+  }
+
   function findNameAndGif(block) {
     const match = block.match(/miner\s+detai(?:ls|s)\s+open(?:\s+[1-5])?\s*(?::|=|-|–|—|\|)?\s*([\s\S]*)/i);
     if (!match) return { name: "", gif: "" };
@@ -76,11 +91,11 @@
       }
       const foundGif = extractGifSource(line);
       if (foundGif && !gif) gif = foundGif;
-      const withoutGif = normalize(line
+      const withoutGif = removeAddresses(line
         .replace(/<img[^>]*>/ig, "")
         .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
         .replace(foundGif || /$^/, ""));
-      if (withoutGif) {
+      if (withoutGif && !looksLikeAddress(withoutGif)) {
         name = withoutGif;
         break;
       }
@@ -126,6 +141,7 @@
         const knownLabels = Object.values(FIELD_PATTERNS).flat();
         fields.name = block.split(/\r?\n/).map(normalize).find(line => {
           if (!line) return false;
+          if (looksLikeAddress(line) || extractGifSource(line)) return false;
           return !knownLabels.some(label => new RegExp("^" + escapeRegExp(label) + "\\b", "i").test(line));
         }) || `Item ${index + 1}`;
       }
