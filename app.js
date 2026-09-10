@@ -88,6 +88,20 @@
     return "Não informado";
   }
 
+  function editorToInput(editor) {
+    const clone = editor.cloneNode(true);
+    clone.querySelectorAll("script, style, iframe, object, embed").forEach(element => element.remove());
+    clone.querySelectorAll("img").forEach(image => {
+      const source = image.getAttribute("src") || "";
+      image.replaceWith(document.createTextNode(source ? `\n${source}\n` : "\n"));
+    });
+    clone.querySelectorAll("br").forEach(lineBreak => lineBreak.replaceWith(document.createTextNode("\n")));
+    clone.querySelectorAll("div, p, li, section, article, header, footer, tr").forEach(element => {
+      element.append(document.createTextNode("\n"));
+    });
+    return clone.textContent.replace(/\n{3,}/g, "\n\n").trim();
+  }
+
   function parseMinerDetails(raw) {
     const marker = /miner\s+detai(?:ls|s)/ig;
     if (!marker.test(raw)) return [];
@@ -203,7 +217,7 @@
   }
 
   function calculate() {
-    const raw = document.querySelector("#raw-data").value;
+    const raw = editorToInput(document.querySelector("#raw-data"));
     const message = document.querySelector("#message");
     const items = parseMinerDetails(raw);
     if (!raw.trim()) {
