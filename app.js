@@ -47,6 +47,8 @@
   }
 
   function extractGifSource(value) {
+    const pastedImage = value.match(/^\[\[MINER_IMAGE\]\](.+)$/i);
+    if (pastedImage) return pastedImage[1].trim();
     const htmlSource = value.match(/<img[^>]+src=["']([^"']+\.gif(?:\?[^"']*)?)["']/i);
     if (htmlSource) return htmlSource[1];
     const markdownSource = value.match(/!\[[^\]]*\]\(([^)]+\.gif(?:\?[^)]*)?)\)/i);
@@ -67,6 +69,11 @@
     let gif = "";
     let name = "";
     for (const line of lines) {
+      const pastedImage = line.match(/^\[\[MINER_IMAGE\]\](.+)$/i);
+      if (pastedImage) {
+        if (!gif) gif = pastedImage[1].trim();
+        continue;
+      }
       const foundGif = extractGifSource(line);
       if (foundGif && !gif) gif = foundGif;
       const withoutGif = normalize(line
@@ -93,7 +100,7 @@
     clone.querySelectorAll("script, style, iframe, object, embed").forEach(element => element.remove());
     clone.querySelectorAll("img").forEach(image => {
       const source = image.getAttribute("src") || "";
-      image.replaceWith(document.createTextNode(source ? `\n${source}\n` : "\n"));
+      image.replaceWith(document.createTextNode(source ? `\n[[MINER_IMAGE]]${source}\n` : "\n"));
     });
     clone.querySelectorAll("br").forEach(lineBreak => lineBreak.replaceWith(document.createTextNode("\n")));
     clone.querySelectorAll("div, p, li, section, article, header, footer, tr").forEach(element => {
